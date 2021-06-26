@@ -108,7 +108,6 @@ def HandlerComboBoxLS():
 		if name in list(config_data.hosts):
 			config_data.host = config_data.hosts[name]["host"]
 			config_data.port = config_data.hosts[name]["port"]
-		os.system("cls")
 		time.sleep(0.5)
 
 def UpdateServerInfoLabels():
@@ -116,7 +115,7 @@ def UpdateServerInfoLabels():
 			if (config_data.host != None) and (config_data.port != None):
 				MindServer = pydustry.Server(str(config_data.host), int(config_data.port))
 				try:
-					mind_status = MindServer.get_status()
+					mind_status = MindServer.get_status(timeout = 3.0)
 					NameServerLabel["text"] = "Имя севрера: {0}".format((re.sub(r"(?<=\[).*?(?=\])", "", mind_status["name"])).replace("[", "").replace("]", ""))
 					MapServerLabel["text"] = "Карта: " + str(mind_status["map"])
 					PlayersServerLabel["text"] = "Игроков: " + str(mind_status["players"])
