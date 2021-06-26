@@ -1,8 +1,10 @@
 # БИМС
-from threading import Thread
 import tkinter as tk
+from tkinter.ttk import Combobox
+from threading import Thread
 import pydustry
 import time
+import wget
 import json
 import sys
 import os
@@ -12,10 +14,9 @@ import re
 class operation:
 	TimeUpdate = True
 	InfoServerUpdate = True
+	ServersListUpdate = True
 
 cfgd_std = {
-				"host": "rcr.fvds.ru",
-				"port": 6567,
 				"attributes": False
 }
 
@@ -24,34 +25,31 @@ class config_data:
 		try:
 			with open("config.json") as config_data_file:
 				config_data_dict = json.load(config_data_file)
-			host = config_data_dict["host"]
-			port = config_data_dict["port"]
 			attributes = config_data_dict["attributes"]
 		except:
-			host = cfgd_std["host"]
-			port = cfgd_std["port"]
 			attributes = cfgd_std["attributes"]
 			config_data_dict = cfgd_std
 			with open("config.json", "w") as config_data_file:
 				json.dump(config_data_dict, config_data_file)
 	else:
-		host = cfgd_std["host"]
-		port = cfgd_std["port"]
 		attributes = cfgd_std["attributes"]
 		config_data_dict = cfgd_std
 		with open("config.json", "w") as config_data_file:
 			json.dump(config_data_dict, config_data_file)
+	hosts = {}
+	host = None
+	port = None
 
 # Инфомация программы
 class proginfo:
 	name = "БИМС"
-	version = "0.1-beta"
+	version = "0.2-beta"
 	author = "Роман Слабицкий"
 
 # Создание окна и настройка
 root = tk.Tk()
 root.title(str(proginfo.name) + " v" + str(proginfo.version))
-root.geometry("500x105")
+root.geometry("500x130")
 root.resizable(0, 0)
 root.attributes("-topmost", config_data.attributes)
 
@@ -63,6 +61,7 @@ PlayersServerLabel = tk.Label(root, text = "Игроков: Загрузка..."
 WaveServerLabel = tk.Label(root, text = "Волна: Загрузка...", font = 'helvetica 10 bold')
 VersionServerLabel = tk.Label(root, text = "Версия ядра: Загрузка...", font = 'helvetica 10 bold')
 ButtonSwitchingOptionsAttributes = tk.Label(root, text = "📌", font = 'helvetica 12 bold')
+ComboboxListServers = Combobox(root, width = 78)
 if config_data.attributes:
 	ButtonSwitchingOptionsAttributes["fg"] = "green"
 else:
@@ -76,6 +75,7 @@ PlayersServerLabel.place(x = 5, y = 40)
 WaveServerLabel.place(x = 5, y = 60)
 VersionServerLabel.place(x = 5, y = 80)
 ButtonSwitchingOptionsAttributes.place(x = 390, y = -5)
+ComboboxListServers.place(x = 5, y = 105)
 
 # Логика
 def UpdateTimeHandler():
@@ -86,23 +86,55 @@ def UpdateTimeHandler():
 			TimeLabel["text"] = "Ошибка"
 		time.sleep(0.5)
 
-def UpdateServerInfoLabels():
-	MindServer = pydustry.Server(str(config_data.host), int(config_data.port))
-	while operation.InfoServerUpdate:
-		try:
-			mind_status = MindServer.get_status()
-			NameServerLabel["text"] = "Имя севрера: {0}".format((re.sub(r"(?<=\[).*?(?=\])", "", mind_status["name"])).replace("[", "").replace("]", ""))
-			MapServerLabel["text"] = "Карта: " + str(mind_status["map"])
-			PlayersServerLabel["text"] = "Игроков: " + str(mind_status["players"])
-			WaveServerLabel["text"] = "Волна: " + str(mind_status["wave"])
-			VersionServerLabel["text"] = "Версия ядра: " + str(mind_status["version"])
-		except:
-			NameServerLabel["text"] = "Имя севрера: Ошибка"
-			MapServerLabel["text"] = "Карта: Ошибка"
-			PlayersServerLabel["text"] = "Игроков: Ошибка"
-			WaveServerLabel["text"] = "Волна: Ошибка"
-			VersionServerLabel["text"] = "Версия ядра: Ошибка"
+def HandlerComboBoxLS():
+	ls_filename = str(wget.download("https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_v6.json"))
+	with open(ls_filename) as ls_file:
+		ls_data = json.load(ls_file)
+	os.remove(ls_filename)
+
+	for i in ls_data:
+		for n in i["address"]:
+			ServerData = n.split(":")
+			if len(ServerData) > 1:
+				config_data.hosts["({0}) {1}".format((re.sub(r"(?<=\[).*?(?=\])", "", i["name"])).replace("[", "").replace("]", ""), n)] = {"host": str(ServerData[0]), "port": int(ServerData[1])}
+			else:
+				config_data.hosts["({0}) {1}".format((re.sub(r"(?<=\[).*?(?=\])", "", i["name"])).replace("[", "").replace("]", ""), n)] = {"host": str(ServerData[0]), "port": 6567}
+
+	ComboboxListServers['value'] = tuple(config_data.hosts)
+	ComboboxListServers.current(0)
+
+	while operation.ServersListUpdate:
+		name = str(ComboboxListServers.get())
+		if name in list(config_data.hosts):
+			config_data.host = config_data.hosts[name]["host"]
+			config_data.port = config_data.hosts[name]["port"]
+		os.system("cls")
 		time.sleep(0.5)
+
+def UpdateServerInfoLabels():
+		while operation.InfoServerUpdate:
+			if (config_data.host != None) and (config_data.port != None):
+				MindServer = pydustry.Server(str(config_data.host), int(config_data.port))
+				try:
+					mind_status = MindServer.get_status()
+					NameServerLabel["text"] = "Имя севрера: {0}".format((re.sub(r"(?<=\[).*?(?=\])", "", mind_status["name"])).replace("[", "").replace("]", ""))
+					MapServerLabel["text"] = "Карта: " + str(mind_status["map"])
+					PlayersServerLabel["text"] = "Игроков: " + str(mind_status["players"])
+					WaveServerLabel["text"] = "Волна: " + str(mind_status["wave"])
+					VersionServerLabel["text"] = "Версия ядра: " + str(mind_status["version"])
+				except:
+					NameServerLabel["text"] = "Имя севрера: Сервер не доступен"
+					MapServerLabel["text"] = "Карта: Сервер не доступен"
+					PlayersServerLabel["text"] = "Игроков: Сервер не доступен"
+					WaveServerLabel["text"] = "Волна: Сервер не доступен"
+					VersionServerLabel["text"] = "Версия ядра: Сервер не доступен"
+			else:
+				NameServerLabel["text"] = "Имя севрера: Секунду..."
+				MapServerLabel["text"] = "Карта: Секунду..."
+				PlayersServerLabel["text"] = "Игроков: Секунду..."
+				WaveServerLabel["text"] = "Волна: Секунду..."
+				VersionServerLabel["text"] = "Версия ядра: Секунду..."
+			time.sleep(0.5)
 
 def SwitchingOptionsAttributes(event):
 	global config_data
@@ -125,6 +157,7 @@ ButtonSwitchingOptionsAttributes.bind('<Button-1>', SwitchingOptionsAttributes)
 # Запуск в фоне
 Thread(target = UpdateTimeHandler, args = (), daemon = True).start()
 Thread(target = UpdateServerInfoLabels, args = (), daemon = True).start()
+Thread(target = HandlerComboBoxLS, args = (), daemon = True).start()
 
 # Конец
 root.mainloop()
