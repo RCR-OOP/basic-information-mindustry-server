@@ -43,12 +43,14 @@ class config_data:
 # Инфомация программы
 class proginfo:
 	name = "БИМС"
-	version = "0.2-beta"
+	version = "0.2.1-beta"
+	versionint = 0.21
 	author = "Роман Слабицкий"
+	company = "RCR"
 
 # Создание окна и настройка
 root = tk.Tk()
-root.title(str(proginfo.name) + " v" + str(proginfo.version))
+root.title("{0} v{1} ({2})".format(proginfo.name, proginfo.version, proginfo.versionint))
 root.geometry("500x130")
 root.resizable(0, 0)
 root.attributes("-topmost", config_data.attributes)
@@ -117,7 +119,7 @@ def UpdateServerInfoLabels():
 				try:
 					mind_status = MindServer.get_status(timeout = 3.0)
 					NameServerLabel["text"] = "Имя севрера: {0}".format((re.sub(r"(?<=\[).*?(?=\])", "", mind_status["name"])).replace("[", "").replace("]", ""))
-					MapServerLabel["text"] = "Карта: " + str(mind_status["map"])
+					MapServerLabel["text"] = "Карта: " + str((re.sub(r"(?<=\[).*?(?=\])", "", mind_status["map"])).replace("[", "").replace("]", ""))
 					PlayersServerLabel["text"] = "Игроков: " + str(mind_status["players"])
 					WaveServerLabel["text"] = "Волна: " + str(mind_status["wave"])
 					VersionServerLabel["text"] = "Версия ядра: " + str(mind_status["version"])
