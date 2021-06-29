@@ -51,7 +51,7 @@ else:
 # Инфомация программы
 class proginfo:
 	name = "БИМС"
-	version = "0.2.2-beta"
+	version = "0.2.2-release"
 	versionint = 0.22
 	author = "Роман Слабицкий"
 	company = "RCR"
