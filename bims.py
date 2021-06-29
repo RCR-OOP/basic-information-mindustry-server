@@ -42,11 +42,14 @@ class config_data:
 	port = None
 
 # Загрузка данных
-if not("Minecraft.ttf" in os.listdir()):
-	FontFileName = wget.download("https://raw.githubusercontent.com/RCR-OOP/basic-information-mindustry-server/main/Minecraft.ttf")
-	pyglet.font.add_file(os.path.abspath(FontFileName))
-else:
-	pyglet.font.add_file(os.path.abspath("Minecraft.ttf"))
+try:
+	if not("Minecraft.ttf" in os.listdir()):
+		FontFileName = wget.download("https://raw.githubusercontent.com/RCR-OOP/basic-information-mindustry-server/main/Minecraft.ttf")
+		pyglet.font.add_file(os.path.abspath(FontFileName))
+	else:
+		pyglet.font.add_file(os.path.abspath("Minecraft.ttf"))
+except:
+	pass
 
 # Инфомация программы
 class proginfo:
