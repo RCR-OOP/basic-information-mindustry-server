@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter.ttk import Combobox
 from threading import Thread
 import pydustry
+import pyglet
 import time
 import wget
 import json
@@ -40,6 +41,8 @@ class config_data:
 	host = None
 	port = None
 
+pyglet.font.add_file(os.path.abspath("Minecraft.ttf"))
+
 # Инфомация программы
 class proginfo:
 	name = "БИМС"
@@ -56,14 +59,24 @@ root.resizable(0, 0)
 root.attributes("-topmost", config_data.attributes)
 
 # Объекты
-TimeLabel = tk.Label(root, text = "Загрузка", font = 'helvetica 10 bold', bg = "black", fg = "white", width = 10)
-NameServerLabel = tk.Label(root, text = "Имя севрера: Загрузка...", font = 'helvetica 10 bold')
-MapServerLabel = tk.Label(root, text = "Карта: Загрузка...", font = 'helvetica 10 bold')
-PlayersServerLabel = tk.Label(root, text = "Игроков: Загрузка...", font = 'helvetica 10 bold')
-WaveServerLabel = tk.Label(root, text = "Волна: Загрузка...", font = 'helvetica 10 bold')
-VersionServerLabel = tk.Label(root, text = "Версия ядра: Загрузка...", font = 'helvetica 10 bold')
-ButtonSwitchingOptionsAttributes = tk.Label(root, text = "📌", font = 'helvetica 12 bold')
-ComboboxListServers = Combobox(root, width = 78)
+try:
+	TimeLabel = tk.Label(root, text = "Загрузка", font = ('Minecraft Rus', 8), bg = "black", fg = "white", width = 10)
+	NameServerLabel = tk.Label(root, text = "Имя севрера: Загрузка...", font = ('Minecraft Rus', 8))
+	MapServerLabel = tk.Label(root, text = "Карта: Загрузка...", font = ('Minecraft Rus', 8))
+	PlayersServerLabel = tk.Label(root, text = "Игроков: Загрузка...", font = ('Minecraft Rus', 8))
+	WaveServerLabel = tk.Label(root, text = "Волна: Загрузка...", font = ('Minecraft Rus', 8))
+	VersionServerLabel = tk.Label(root, text = "Версия ядра: Загрузка...", font = ('Minecraft Rus', 8))
+	ButtonSwitchingOptionsAttributes = tk.Label(root, text = "📌", font = ('Minecraft Rus', 12))
+	ComboboxListServers = Combobox(root, width = 78)
+except:
+	TimeLabel = tk.Label(root, text = "Загрузка", font = 'helvetica 10 bold', bg = "black", fg = "white", width = 10)
+	NameServerLabel = tk.Label(root, text = "Имя севрера: Загрузка...", font = 'helvetica 10 bold')
+	MapServerLabel = tk.Label(root, text = "Карта: Загрузка...", font = 'helvetica 10 bold')
+	PlayersServerLabel = tk.Label(root, text = "Игроков: Загрузка...", font = 'helvetica 10 bold')
+	WaveServerLabel = tk.Label(root, text = "Волна: Загрузка...", font = 'helvetica 10 bold')
+	VersionServerLabel = tk.Label(root, text = "Версия ядра: Загрузка...", font = 'helvetica 10 bold')
+	ButtonSwitchingOptionsAttributes = tk.Label(root, text = "📌", font = 'helvetica 12 bold')
+	ComboboxListServers = Combobox(root, width = 78)
 if config_data.attributes:
 	ButtonSwitchingOptionsAttributes["fg"] = "green"
 else:
