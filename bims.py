@@ -41,13 +41,18 @@ class config_data:
 	host = None
 	port = None
 
-pyglet.font.add_file(os.path.abspath("Minecraft.ttf"))
+# Загрузка данных
+if not("Minecraft.ttf" in os.listdir()):
+	FontFileName = wget.download("https://raw.githubusercontent.com/RCR-OOP/basic-information-mindustry-server/main/Minecraft.ttf")
+	pyglet.font.add_file(os.path.abspath(FontFileName))
+else:
+	pyglet.font.add_file(os.path.abspath("Minecraft.ttf"))
 
 # Инфомация программы
 class proginfo:
 	name = "БИМС"
-	version = "0.2.1-beta"
-	versionint = 0.21
+	version = "0.2.2-beta"
+	versionint = 0.22
 	author = "Роман Слабицкий"
 	company = "RCR"
 
